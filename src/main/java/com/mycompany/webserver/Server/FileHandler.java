@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 public class FileHandler {
 
   private static final String BASE_PATH = "src/main/resources/public";
+  private static final String IMAGE_PATH = "src/main/resources/imagenes";
 
   public static byte[] serveStaticFile(String path) throws IOException {
     if (path.equals("/")) {
@@ -28,14 +29,14 @@ public class FileHandler {
     }
   }
 
-  public static String getContentType(String filePath) {
-    if (filePath.endsWith(".html")) return "text/html";
-    if (filePath.endsWith(".css")) return "text/css";
-    if (filePath.endsWith(".js")) return "application/javascript";
-    if (filePath.endsWith(".png")) return "image/png";
-    if (
-      filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")
-    ) return "image/jpeg";
-    return "application/octet-stream";
+  public static String getContentType(String path) {
+    if (path.endsWith(".css")) return "text/css";
+    if (path.endsWith(".js")) return "application/javascript";
+    if (path.endsWith(".html")) return "text/html";
+    if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+    if (path.endsWith(".png")) return "image/png";
+    if (path.endsWith(".gif")) return "image/gif";
+    if (path.endsWith(".ico")) return "image/x-icon"; // Para favicons
+    return "text/plain";
   }
 }
