@@ -2,78 +2,139 @@ package com.mycompany.webserver.Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HTTPServer {
 
-  public static void main(String[] args) throws IOException {
-    ServerSocket serverSocket = new ServerSocket(35000);
-    System.out.println("Servidor iniciado en el puerto 35000");
+  private static List<Route> routes = new ArrayList<>();
+  private static String staticFilesPath = "src/main/resources/public";
 
+  public static void main(String[] args) throws IOException {
+    staticfiles("/public");
+    get("/hello", (req, res) -> "Hello " + req.getQueryParam("name"));
+    get("/pi", (req, res) -> String.valueOf(Math.PI));
+
+    ServerSocket serverSocket = new ServerSocket(8080);
     while (true) {
-      try (Socket clientSocket = serverSocket.accept()) {
-        handleRequest(clientSocket);
-      } catch (IOException e) {
-        System.err.println("Error en la conexión: " + e.getMessage());
-      }
+      Socket clientSocket = serverSocket.accept();
+      handleClientRequest(clientSocket);
     }
   }
 
-  private static void handleRequest(Socket clientSocket) throws IOException {
+  public static void staticfiles(String path) {
+    staticFilesPath = "src/main/resources" + path;
+  }
+
+  public static void get(String path, RouteHandler handler) {
+    routes.add(new Route(path, handler));
+  }
+
+  private static void handleClientRequest(Socket clientSocket)
+    throws IOException {
     BufferedReader in = new BufferedReader(
       new InputStreamReader(clientSocket.getInputStream())
     );
-    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+    BufferedWriter out = new BufferedWriter(
+      new OutputStreamWriter(clientSocket.getOutputStream())
+    );
 
     String requestLine = in.readLine();
+    if (requestLine == null) {
+      clientSocket.close();
+      return;
+    }
+
     System.out.println("Solicitud recibida: " + requestLine);
     String[] requestParts = requestLine.split(" ");
-    if (requestParts.length < 2) return;
+    if (requestParts.length < 2) {
+      clientSocket.close();
+      return;
+    }
 
     String method = requestParts[0];
     String path = requestParts[1];
 
-    if (path.startsWith("/api")) {
-      String jsonResponse = APIHandler.handleAPIRequest(path);
-      sendResponse(out, "200 OK", "application/json", jsonResponse);
+    if (method.equals("GET")) {
+      handleGetRequest(path, out);
     } else {
-      if (path.equals("/") || path.equals("/index.html")) {
-        path = "/index.html"; // Asegurarse de que la ruta sea correcta
-      }
-      File staticFile = new File(
-        "src/main/java/com/mycompany/webserver/Public" + path
+      sendResponse(
+        out,
+        "405 Method Not Allowed",
+        "text/plain",
+        "Método no permitido"
       );
-      if (staticFile.exists() && staticFile.isFile()) {
-        BufferedReader reader = new BufferedReader(new FileReader(staticFile));
-        StringBuilder contentBuilder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-          contentBuilder.append(line).append("\n");
-        }
-        reader.close();
-        String fileResponse = contentBuilder.toString();
-        String contentType = FileHandler.getContentType(path);
-        sendResponse(out, "200 OK", contentType, fileResponse);
-      } else {
+    }
+
+    clientSocket.close();
+  }
+
+  private static void handleGetRequest(String path, BufferedWriter out)
+    throws IOException {
+    Request req = new Request(path);
+    Response res = new Response();
+    for (Route route : routes) {
+      if (route.getPath().equals(req.getPath())) {
+        String responseBody = route.getHandler().handle(req, res);
         sendResponse(
           out,
-          "404 Not Found",
-          "text/html",
-          "<h1>404 Not Found</h1>"
+          res.getStatusCode() + " OK",
+          res.getContentType(),
+          responseBody
         );
+        return;
       }
     }
-    in.close();
-    out.close();
+
+    // Si la ruta es "/", redirigir a index.html
+    if (req.getPath().equals("/")) {
+      req = new Request("/index.html");
+    }
+
+    // Manejar solicitudes a la API
+    if (req.getPath().startsWith("/api")) {
+      String jsonResponse = APIHandler.handleAPIRequest(req.getPath());
+      sendResponse(out, "200 OK", "application/json", jsonResponse);
+      return;
+    }
+
+    // Manejar solicitudes de archivos estáticos
+    File staticFile = new File(staticFilesPath + req.getPath());
+    if (!staticFile.exists()) {
+      staticFile = new File("src/main/resources" + req.getPath());
+    }
+    if (staticFile.exists() && staticFile.isFile()) {
+      BufferedReader reader = new BufferedReader(new FileReader(staticFile));
+      StringBuilder contentBuilder = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        contentBuilder.append(line).append("\n");
+      }
+      sendResponse(
+        out,
+        "200 OK",
+        FileHandler.getContentType(req.getPath()),
+        contentBuilder.toString()
+      );
+    } else {
+      sendResponse(out, "404 Not Found", "text/plain", "Archivo no encontrado");
+    }
   }
 
   private static void sendResponse(
-    PrintWriter out,
+    BufferedWriter out,
     String status,
     String contentType,
     String content
-  ) {
-    out.println("HTTP/1.1 " + status);
-    out.println("Content-Type: " + contentType);
-    out.println("\r\n" + content);
+  ) throws IOException {
+    try {
+      out.write("HTTP/1.1 " + status + "\r\n");
+      out.write("Content-Type: " + contentType + "\r\n");
+      out.write("\r\n");
+      out.write(content);
+      out.flush();
+    } catch (SocketException e) {
+      System.err.println("Error al enviar la respuesta: " + e.getMessage());
+    }
   }
 }

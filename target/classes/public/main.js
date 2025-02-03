@@ -1,4 +1,3 @@
-
 const imagenes = {
   "El señor de los anillos": "https://images.unsplash.com/photo-1506466010722-395aa2bef877",
   "1984": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c",
