@@ -18,13 +18,6 @@ public class WebApplication {
     );
 
     get(
-      "/",
-      (req, resp) -> {
-        return index.html;
-      }
-    );
-
-    get(
       "/app/e",
       (req, resp) -> {
         return String.valueOf(Math.E);
