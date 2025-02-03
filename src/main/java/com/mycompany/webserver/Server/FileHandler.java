@@ -7,7 +7,8 @@ import java.nio.file.Paths;
 
 public class FileHandler {
 
-  private static final String BASE_PATH = "/src/main/resources"; // Carpeta donde estarán los archivos
+  private static final String BASE_PATH =
+    "/src/main/java/com/mycompany/webserver"; // Carpeta donde estarán los archivos
 
   public static byte[] serveStaticFile(String path) throws IOException {
     if (path.equals("/")) {
@@ -37,7 +38,7 @@ public class FileHandler {
     } else if (path.endsWith(".gif")) {
       return "image/gif";
     } else {
-      return "text/plain";
+      return "octet-stream";
     }
   }
 }

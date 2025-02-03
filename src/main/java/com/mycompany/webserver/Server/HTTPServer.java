@@ -2,19 +2,31 @@ package com.mycompany.webserver.Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 public class HTTPServer {
 
-  public static void main(String[] args) throws IOException {
-    ServerSocket serverSocket = new ServerSocket(35000);
-    System.out.println("Servidor iniciado en el puerto 35000");
+  private static Map<String, BiFunction<String, String, String>> servicios = new HashMap<>();
 
-    while (true) {
-      try (Socket clientSocket = serverSocket.accept()) {
-        handleRequest(clientSocket);
-      } catch (IOException e) {
-        System.err.println("Error en la conexión: " + e.getMessage());
+  public static void start(String[] args) throws IOException {
+    try {
+      ServerSocket serverSocket = new ServerSocket(35000);
+      System.out.println("Servidor iniciado en el puerto 35000");
+      boolean running = true;
+      while (running) {
+        try (Socket clientSocket = serverSocket.accept()) {
+          System.out.println(
+            "Cliente conectado desde " + clientSocket.getInetAddress()
+          );
+          handleRequest(clientSocket);
+        } catch (IOException e) {
+          System.err.println("Error en la conexión: " + e.getMessage());
+        }
       }
+    } catch (IOException e) {
+      System.err.println("Error en el servidor: " + e.getMessage());
     }
   }
 
@@ -32,7 +44,7 @@ public class HTTPServer {
     String method = requestParts[0];
     String path = requestParts[1];
 
-    if (path.startsWith("/api")) {
+    if (path.startsWith("/api/hello")) {
       String jsonResponse = APIHandler.handleAPIRequest(path);
       sendResponse(out, "200 OK", "application/json", jsonResponse);
     } else {
