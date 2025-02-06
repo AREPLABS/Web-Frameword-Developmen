@@ -73,6 +73,8 @@ public class HTTPServer {
     throws IOException {
     Request req = new Request(path);
     Response res = new Response();
+
+    // Buscar en rutas definidas
     for (Route route : routes) {
       if (route.getPath().equals(req.getPath())) {
         String responseBody = route.getHandler().handle(req, res);
@@ -86,7 +88,7 @@ public class HTTPServer {
       }
     }
 
-    // Si la ruta es "/", redirigir a index.html
+    // Redirigir "/" a "/index.html"
     if (req.getPath().equals("/")) {
       req = new Request("/index.html");
     }
@@ -98,23 +100,14 @@ public class HTTPServer {
       return;
     }
 
-    // Manejar solicitudes de archivos estáticos
-    File staticFile = new File(staticFilesPath + req.getPath());
-    if (!staticFile.exists()) {
-      staticFile = new File("src/main/resources" + req.getPath());
-    }
-    if (staticFile.exists() && staticFile.isFile()) {
-      BufferedReader reader = new BufferedReader(new FileReader(staticFile));
-      StringBuilder contentBuilder = new StringBuilder();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        contentBuilder.append(line).append("\n");
-      }
+    // Servir archivos estáticos
+    byte[] fileContent = FileHandler.serveStaticFile(req.getPath());
+    if (fileContent != null) {
       sendResponse(
         out,
         "200 OK",
         FileHandler.getContentType(req.getPath()),
-        contentBuilder.toString()
+        new String(fileContent)
       );
     } else {
       sendResponse(out, "404 Not Found", "text/plain", "Archivo no encontrado");
