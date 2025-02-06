@@ -7,8 +7,8 @@ import java.util.List;
 
 public class HTTPServer {
 
-  private static List<Route> routes = new ArrayList<>();
-  private static String staticFilesPath = "src/main/resources/public";
+  public static List<Route> routes = new ArrayList<>();
+  public static String staticFilesPath = "src/main/resources/public";
 
   public static void main(String[] args) throws IOException {
     staticfiles("/public");
@@ -30,7 +30,7 @@ public class HTTPServer {
     routes.add(new Route(path, handler));
   }
 
-  private static void handleClientRequest(Socket clientSocket)
+  public static void handleClientRequest(Socket clientSocket)
     throws IOException {
     BufferedReader in = new BufferedReader(
       new InputStreamReader(clientSocket.getInputStream())
@@ -73,8 +73,6 @@ public class HTTPServer {
     throws IOException {
     Request req = new Request(path);
     Response res = new Response();
-
-    // Buscar en rutas definidas
     for (Route route : routes) {
       if (route.getPath().equals(req.getPath())) {
         String responseBody = route.getHandler().handle(req, res);
@@ -88,7 +86,7 @@ public class HTTPServer {
       }
     }
 
-    // Redirigir "/" a "/index.html"
+    // Si la ruta es "/", redirigir a index.html
     if (req.getPath().equals("/")) {
       req = new Request("/index.html");
     }
@@ -100,7 +98,7 @@ public class HTTPServer {
       return;
     }
 
-    // Servir archivos estáticos
+    // Manejar solicitudes de archivos estáticos
     byte[] fileContent = FileHandler.serveStaticFile(req.getPath());
     if (fileContent != null) {
       sendResponse(
