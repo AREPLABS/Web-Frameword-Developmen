@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 public class FileHandler {
 
   private static final String BASE_PATH = "src/main/resources/public";
-  private static final String IMAGE_PATH = "src/main/resources/public/imagenes";
+  private static final String IMAGE_PATH = "src/main/resources/imagenes";
 
   public static byte[] serveStaticFile(String path) throws IOException {
     if (path.equals("/")) {
@@ -28,7 +28,6 @@ public class FileHandler {
       }
     }
     Path filePath = Paths.get(BASE_PATH, path);
-    System.out.println("Buscando archivo en: " + filePath.toString());
 
     if (!Files.exists(filePath)) {
       filePath = Paths.get(IMAGE_PATH, path);

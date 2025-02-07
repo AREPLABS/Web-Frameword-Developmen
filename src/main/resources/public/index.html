@@ -5,13 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mis Libros</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Mis Libros</h1>
-  <div id="libros"></div>
-  <div id="response"></div>
+  <div id="libros" class="libros-container"></div>
+  
+  <!-- Modal para la previsualización del libro -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 class="modal-title"></h2>
+      <p class="modal-text"></p>
+      <img class="modal-img" src="" alt="Imagen del libro">
+    </div>
+  </div>
+
   <script src="main.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ import java.util.List;
 public class HTTPServer {
 
   public static List<Route> routes = new ArrayList<>();
-  public static String staticFilesPath = "src/main/resources";
+  public static String staticFilesPath = "src/main/resources/public";
 
   /**
    * Método principal que inicia el servidor.
@@ -49,7 +49,7 @@ public class HTTPServer {
    * @param path La ruta de los archivos estáticos.
    */
   public static void staticfiles(String path) {
-    staticFilesPath = "src/main/resources" + path;
+    staticFilesPath = "public" + path;
   }
 
   /**
@@ -123,19 +123,16 @@ public class HTTPServer {
       }
     }
 
-    // Si la ruta es "/", redirigir a index.html
     if (req.getPath().equals("/")) {
       req = new Request("/index.html");
     }
 
-    // Manejar solicitudes a la API
     if (req.getPath().startsWith("/api")) {
       String jsonResponse = APIHandler.handleAPIRequest(req.getPath());
       sendResponse(out, "200 OK", "application/json", jsonResponse);
       return;
     }
 
-    // Manejar solicitudes de archivos estáticos
     byte[] fileContent = FileHandler.serveStaticFile(req.getPath());
     if (fileContent != null) {
       sendResponse(
