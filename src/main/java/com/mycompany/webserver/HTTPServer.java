@@ -1,5 +1,7 @@
-package com.mycompany.webserver.Server;
+package com.mycompany.webserver;
 
+import com.mycompany.webserver.Server.*;
+import com.mycompany.webserver.Server.Route;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
