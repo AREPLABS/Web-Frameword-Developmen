@@ -5,14 +5,35 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase principal que representa el servidor HTTP.
+ *
+ * @author Diego Chicuazuque
+ * @version 1.0
+ */
 public class HTTPServer {
 
   public static List<Route> routes = new ArrayList<>();
-  public static String staticFilesPath = "src/main/resources/public";
+  public static String staticFilesPath = "src/main/resources";
 
+  /**
+   * Método principal que inicia el servidor.
+   *
+   * @param args Los argumentos de la línea de comandos.
+   * @throws IOException Si ocurre un error de entrada/salida.
+   */
   public static void main(String[] args) throws IOException {
     staticfiles("/public");
-    get("/hello", (req, res) -> "Hello " + req.getQueryParam("name"));
+    get(
+      "/hello",
+      (req, res) -> {
+        String name = req.getQueryParam("name");
+        if (name == null) {
+          name = "World";
+        }
+        return "Hello " + name;
+      }
+    );
     get("/pi", (req, res) -> String.valueOf(Math.PI));
 
     ServerSocket serverSocket = new ServerSocket(8080);
@@ -22,14 +43,30 @@ public class HTTPServer {
     }
   }
 
+  /**
+   * Configura la ruta de los archivos estáticos.
+   *
+   * @param path La ruta de los archivos estáticos.
+   */
   public static void staticfiles(String path) {
     staticFilesPath = "src/main/resources" + path;
   }
 
+  /**
+   * Registra una ruta y su manejador.
+   * @param path
+   * @param handler
+   */
   public static void get(String path, RouteHandler handler) {
     routes.add(new Route(path, handler));
   }
 
+  /**
+   * Maneja una solicitud de cliente.
+   *
+   * @param clientSocket El socket del cliente.
+   * @throws IOException Si ocurre un error de entrada/salida.
+   */
   public static void handleClientRequest(Socket clientSocket)
     throws IOException {
     BufferedReader in = new BufferedReader(

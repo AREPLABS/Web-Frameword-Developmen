@@ -1,12 +1,29 @@
 package com.mycompany.webserver.Server;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/**
+ * Clase que maneja las peticiones a la API.
+ *
+ * @author Diego Chicuazuque
+ * @version 1.0
+ */
 public class APIHandler {
 
+  /**
+   * Maneja las peticiones a la API.
+   *
+   * @param path La ruta de la petición.
+   * @return La respuesta a la petición.
+   */
   public static String handleAPIRequest(String path) {
     if (path.equals("/api/hello")) {
       return "{ \"message\": \"Hola, bienvenido a la API\" }";
     } else if (path.equals("/api/libros")) {
-      System.out.println("APIHandler.java");
       return (
         "{ \"libros\": [" +
         "{ \"titulo\": \"El señor de los anillos\", \"autor\": \"J.R.R. Tolkien\", \"anio\": 1954, \"imagen\": \"/imagenes/lotr.jpg\" }," +

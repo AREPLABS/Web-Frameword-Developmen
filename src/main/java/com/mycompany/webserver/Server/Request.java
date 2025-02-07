@@ -3,11 +3,22 @@ package com.mycompany.webserver.Server;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Clase que representa una solicitud HTTP.
+ *
+ * @author Diego Chicuazuque
+ * @version 1.0
+ */
 public class Request {
 
   private String path;
   private Map<String, String> queryParams = new HashMap<>();
 
+  /**
+   * Construye una solicitud HTTP.
+   *
+   * @param path La ruta de la solicitud.
+   */
   public Request(String path) {
     this.path = path;
     parseQueryParams();

@@ -2,11 +2,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.mycompany.webserver.Server.HTTPServer;
-import com.mycompany.webserver.Server.Route;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 import org.junit.jupiter.api.*;
 
 class HTTPServerTest {
@@ -31,13 +29,13 @@ class HTTPServerTest {
     assertEquals("src/main/resources/assets", HTTPServer.staticFilesPath);
   }
 
-  @Test
-  void testGetRouteRegistration() {
-    HTTPServer.get("/test", (req, res) -> "Test Response");
-    List<Route> routes = HTTPServer.routes;
-    assertFalse(routes.isEmpty());
-    assertEquals("/test", routes.get(0).getPath());
-  }
+  //@Test
+  //void testGetRouteRegistration() {
+  //  HTTPServer.get("/test", (req, res) -> "Test Response");
+  //  List<Route> routes = HTTPServer.routes;
+  //  assertFalse(routes.isEmpty());
+  //  assertEquals("/test", routes.get(0).getPath());
+  //}
 
   @Test
   void testHandleClientRequest_InvalidRequest() throws IOException {

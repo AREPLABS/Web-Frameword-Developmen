@@ -7,6 +7,7 @@ const imagenes = {
 function crearTarjetaLibro(libro) {
   return `
     <div class="libro-card">
+      ${libro.recomendado ? '<div class="libro-recomendado">Recomendado</div>' : ''}
       <img class="libro-imagen" src="${libro.imagen}" alt="${libro.titulo}">
       <h2 class="libro-titulo">${libro.titulo}</h2>
       <p class="libro-autor">por ${libro.autor}</p>
