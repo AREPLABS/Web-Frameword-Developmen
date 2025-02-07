@@ -282,6 +282,3 @@ Con esta sección puedes explicar el uso de funciones lambda en tu framework de 
 
 Este proyecto está bajo la **Licencia MIT**. Puedes ver los detalles de la licencia en el archivo `SECURITY`.
 
----
-
-¡Espero que esta estructura sea lo que necesitas! 🎉
